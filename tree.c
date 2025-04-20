@@ -43,7 +43,7 @@ int execute_cmds(char **cmds, char **env)
     }
     return (0);
 }
-int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
+int execute_pipe(t_tree *node, char **env, t_env *envlist)
 {
     pid_t pid1;
     pid_t pid2;
@@ -61,7 +61,7 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
         close(pipe_fd[0]);
         dup2(pipe_fd[1], STDOUT_FILENO);
         close(pipe_fd[1]);
-        execute_tree(node->left, env, envlist, token);
+        execute_tree(node->left, env, envlist);
         exit(0);
     }
     pid2 = fork();
@@ -72,7 +72,7 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
         close(pipe_fd[1]);
         dup2(pipe_fd[0], STDIN_FILENO);
         close(pipe_fd[0]);
-        execute_tree(node->right, env, envlist, token);
+        execute_tree(node->right, env, envlist);
         exit(0);
     }
     close(pipe_fd[0]);
@@ -110,24 +110,17 @@ int handle_redirection(t_tree *node)
     return (0);
 }
 
-int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
+int execute_tree(t_tree *node, char **env, t_env *envlist)
 {
     int status;
 
     status = 0;
     if (node->type == PIPE)
-        return (execute_pipe(node, env, envlist, token));
+        return (execute_pipe(node, env, envlist));
     else if (node->type == CMD)
     {
         if (is_builtin(node->cmd[0]))
-        {
-            if (!token) 
-            {
-                printf("Error: Token structure is invalid\n");
-                return 1;
-            }
-            return (execute_builtin(token, &envlist));
-        }
+            return (execute_builtin(node, &envlist));
         else
             return (execute_cmds(node->cmd, env));
     }
@@ -140,11 +133,11 @@ int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
     //  } 
      else if (node->type == AND || node->type == OR)
      {
-        status = execute_tree(node->left, env, envlist, token);
+        status = execute_tree(node->left, env, envlist);
         if (node->type == AND && status == 0)
-            return (execute_tree(node->right, env, envlist, token));
+            return (execute_tree(node->right, env, envlist));
         if (node->type == OR && status != 0)
-            return (execute_tree(node->right, env, envlist, token));
+            return (execute_tree(node->right, env, envlist));
         return (status);
      }
      return (1);

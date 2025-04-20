@@ -52,7 +52,7 @@ int	main(int argc, char **argv, char **env)
 			append_token(&token_list, token);
 		}
 		node = parse_op(token_list);
-		execute_tree(node, env, envlist, token_list);
+		execute_tree(node, env, envlist);
         free(input);
 	}
 	return (0);

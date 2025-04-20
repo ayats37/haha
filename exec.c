@@ -123,22 +123,22 @@ char *get_env_value(char *name, t_env *env_list)
     return(NULL);
 }
 
-int execute_builtin(t_token *token, t_env **envlist)
+int execute_builtin(t_tree *node, t_env **envlist)
 {
-    if (strcmp(token->value, "echo") == 0)
-        return(ft_echo(token, *envlist));
-    else if (strcmp(token->value, "cd") == 0)
-        return(ft_cd(token));
-    else if (strcmp(token->value, "pwd") == 0)
+    if (strcmp(node->cmd[0], "echo") == 0)
+        return(ft_echo(node->cmd, *envlist));
+    // else if (strcmp(node->cmd[0], "cd") == 0)
+    //     return(ft_cd(node));
+    else if (strcmp(node->cmd[0], "pwd") == 0)
         return(ft_pwd());
-    else if (strcmp(token->value, "export") == 0)
-        return(ft_export(token, envlist));
-    else if (strcmp(token->value, "unset") == 0)
-        return(ft_unset(token, envlist));
-    else if (strcmp(token->value, "env") == 0)
+    else if (strcmp(node->cmd[0], "export") == 0)
+        return(ft_export(node->cmd, envlist));
+    // else if (strcmp(node->cmd[0], "unset") == 0)
+    //     return(ft_unset(node, envlist));
+    else if (strcmp(node->cmd[0], "env") == 0)
         return(ft_env(*envlist));
-    else if (strcmp(token->value, "exit") == 0)
-        return(ft_exit(token, *envlist));
+    else if (strcmp(node->cmd[0], "exit") == 0)
+        return(ft_exit(node->cmd, *envlist));
     return (0);
 }
 
