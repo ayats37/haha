@@ -112,10 +112,10 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
 
 int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
 {
-    // int status;
+    int status;
     // char *cmd[] = {"cat","file", NULL};
     // (void)envlist;
-    // status = 0;
+    status = 0;
     // if (!node)
     // {
     //     write(1, "eegrg\n", 7);
@@ -162,14 +162,14 @@ int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
     //         return (status);
     //     return (execute_tree(node->left, env));
     //  } 
-    //  else if (node->type == AND || node->type == OR)
-    //  {
-    //     status = execute_tree(node->left, env);
-    //     if (node->type == AND && status == 0)
-    //         return (execute_tree(node->right, env));
-    //     if (node->type == OR && status != 0)
-    //         return (execute_tree(node->right, env));
-    //     return (status);
-    //  }
+     else if (node->type == AND || node->type == OR)
+     {
+        status = execute_tree(node->left, env, envlist, token);
+        if (node->type == AND && status == 0)
+            return (execute_tree(node->right, env, envlist, token));
+        if (node->type == OR && status != 0)
+            return (execute_tree(node->right, env, envlist, token));
+        return (status);
+     }
      return (1);
 }
