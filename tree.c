@@ -83,64 +83,42 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
     return (WEXITSTATUS(status2));
 }
 
-// int handle_redirection(t_tree *node)
-// {
-//     int fd;
-//     if (node->type == REDIR_IN)
-//     {
-//         if ((fd = open(node->file, O_RDONLY)) == -1)
-//             write_error("open fd failed");
-//         dup2(fd, STDIN_FILENO);
-//         close(fd);
-//     }
-//     if (node->type == REDIR_OUT)
-//     {
-//         if ((fd = open(node->file,  O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
-//             write_error("open fd failed");
-//         dup2(fd, STDOUT_FILENO);
-//         close(fd);
-//     }
-//     if (node->type == APPEND)
-//     {
-//         if ((fd = open(node->file, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
-//             write_error("open fd failed");
-//         dup2(fd, STDOUT_FILENO);
-//         close(fd);
-//     }
-//     return (0);
-// }
+int handle_redirection(t_tree *node)
+{
+    int fd;
+    if (node->type == REDIR_IN)
+    {
+        if ((fd = open(*node->cmd, O_RDONLY)) == -1)
+            write_error("open fd failed");
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }
+    if (node->type == REDIR_OUT)
+    {
+        if ((fd = open(*node->cmd,  O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
+            write_error("open fd failed");
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+    if (node->type == APPEND)
+    {
+        if ((fd = open(*node->cmd, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+            write_error("open fd failed");
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
+    }
+    return (0);
+}
 
 int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
 {
     int status;
-    // char *cmd[] = {"cat","file", NULL};
-    // (void)envlist;
-    status = 0;
-    // if (!node)
-    // {
-    //     write(1, "eegrg\n", 7);
-    //     return (1);
-    // }
-    // write(1, "oooo\n", 5);
-    // printf("left = %s\n", node->left->value);
-    // printf("right = %s\n", node->right->value);
-    // if (node)
-    // {
 
-    //     // printf("value %s\n", node->value);
-    //     printf("type = %d\n", node->type);
-    // }
+    status = 0;
     if (node->type == PIPE)
-    {
-        write(1, "pipe\n", 5);
         return (execute_pipe(node, env, envlist, token));
-    }
     else if (node->type == CMD)
     {
-        // if (!node->cmd || !node->cmd[0]) {
-        //     printf("Error: Command structure is invalid\n");
-        //     return 1;
-        // }
         if (is_builtin(node->cmd[0]))
         {
             if (!token) 
@@ -153,14 +131,12 @@ int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
         else
             return (execute_cmds(node->cmd, env));
     }
-    // else if (node->type == PIPE)
-    //     return (execute_pipe(node, env));
     // else if (node->type == REDIR_IN || node->type == REDIR_OUT || node->type == APPEND || node->type == HEREDOC)
     //  {
     //     status = handle_redirection(node);
     //     if (status != 0)
     //         return (status);
-    //     return (execute_tree(node->left, env));
+    //     return (execute_tree(node->left, env, envlist, token));
     //  } 
      else if (node->type == AND || node->type == OR)
      {

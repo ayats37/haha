@@ -53,7 +53,6 @@ int	main(int argc, char **argv, char **env)
 		}
 		node = parse_op(token_list);
 		execute_tree(node, env, envlist, token_list);
-        // execute_builtin(token_list, &envlist);
         free(input);
 	}
 	return (0);
