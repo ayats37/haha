@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 12:58:09 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/20 18:35:24 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/20 20:39:03 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@ typedef struct s_lexer {
 }	t_lexer;
 
 typedef enum s_type {
-    CMD,
-	WORD,
+    CMD = 1,
 	PIPE,
 	SINGLE_QUOTE,
 	DOUBLE_QUOTE,
@@ -75,7 +74,7 @@ typedef struct s_env
 
 
 
-//************************************************************tokenzation********************************************************************************
+//****************************************parse********************************************************************************
 t_lexer	*initialize_lexer(char *input);
 int	is_space(t_lexer *lexer);
 void	skip_whitespace(t_lexer *lexer);
@@ -112,9 +111,12 @@ int  is_alphanumeric(int c);
 char	*find_cmd_path(char *cmd, char **env);
 char	**split_cmd(char *cmd);
 char	**ft_split(char const *s, char c);
-int execute_tree(t_tree *node, char **env);
+// int execute_tree(t_tree *node, char **env, t_env *envlist);
+int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token);
 int execute_cmds(char **cmds, char **env);
 void write_error(char *message);
+// int execute_pipe(t_tree *node, char **env, t_env *envlist);
+int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token);
 int is_builtin(char *cmd);
 
 #endif

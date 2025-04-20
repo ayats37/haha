@@ -43,7 +43,7 @@ int execute_cmds(char **cmds, char **env)
     }
     return (0);
 }
-int execute_pipe(t_tree *node, char **env)
+int execute_pipe(t_tree *node, char **env, t_env *envlist, t_token *token)
 {
     pid_t pid1;
     pid_t pid2;
@@ -61,8 +61,7 @@ int execute_pipe(t_tree *node, char **env)
         close(pipe_fd[0]);
         dup2(pipe_fd[1], STDOUT_FILENO);
         close(pipe_fd[1]);
-        printf("left = %s", node->left->value);
-        execute_tree(node->left, env);
+        execute_tree(node->left, env, envlist, token);
         exit(0);
     }
     pid2 = fork();
@@ -73,8 +72,7 @@ int execute_pipe(t_tree *node, char **env)
         close(pipe_fd[1]);
         dup2(pipe_fd[0], STDIN_FILENO);
         close(pipe_fd[0]);
-        printf("right = %s", node->right->value);
-        execute_tree(node->right, env);
+        execute_tree(node->right, env, envlist, token);
         exit(0);
     }
     close(pipe_fd[0]);
@@ -112,7 +110,7 @@ int execute_pipe(t_tree *node, char **env)
 //     return (0);
 // }
 
-int execute_tree(t_tree *node, char **env)
+int execute_tree(t_tree *node, char **env, t_env *envlist, t_token *token)
 {
     // int status;
     // char *cmd[] = {"cat","file", NULL};
@@ -123,18 +121,36 @@ int execute_tree(t_tree *node, char **env)
     //     write(1, "eegrg\n", 7);
     //     return (1);
     // }
-    write(1, "oooo\n", 5);
+    // write(1, "oooo\n", 5);
+    // printf("left = %s\n", node->left->value);
+    // printf("right = %s\n", node->right->value);
+    // if (node)
+    // {
+
+    //     // printf("value %s\n", node->value);
+    //     printf("type = %d\n", node->type);
+    // }
     if (node->type == PIPE)
     {
         write(1, "pipe\n", 5);
-        return (execute_pipe(node, env));
+        return (execute_pipe(node, env, envlist, token));
     }
-    if (node->type == CMD)
+    else if (node->type == CMD)
     {
-    write(1, "aaaa\n", 5);
-        // if (is_builtin(node->cmd[0]))
-        //     return (execute_builtin(node->token, &envlist));
-        // else
+        // if (!node->cmd || !node->cmd[0]) {
+        //     printf("Error: Command structure is invalid\n");
+        //     return 1;
+        // }
+        if (is_builtin(node->cmd[0]))
+        {
+            if (!token) 
+            {
+                printf("Error: Token structure is invalid\n");
+                return 1;
+            }
+            return (execute_builtin(token, &envlist));
+        }
+        else
             return (execute_cmds(node->cmd, env));
     }
     // else if (node->type == PIPE)

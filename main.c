@@ -18,7 +18,7 @@ int	main(int argc, char **argv, char **env)
 	t_token	*token;
 	t_token *token_list = NULL;
 	t_tree	*node = NULL;
-    // t_env *envlist = init_env(env);
+    t_env *envlist = init_env(env);
 
 
 	(void)argc;
@@ -52,7 +52,7 @@ int	main(int argc, char **argv, char **env)
 			append_token(&token_list, token);
 		}
 		node = parse_op(token_list);
-		execute_tree(node, env);
+		execute_tree(node, env, envlist, token_list);
         // execute_builtin(token_list, &envlist);
         free(input);
 	}

@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 12:07:43 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/20 18:23:24 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/20 20:39:20 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ t_type	token_type(t_token *token)
 	else if (strcmp(token->value, ")") == 0)
 		return (CLOSE_PAREN);
 	else
-		return (WORD);
+		return (CMD);
 }
 
 void	append_token(t_token **head, t_token *token)
@@ -248,6 +248,7 @@ t_tree *create_tree_node(t_token *token, char **cmd)
 	if (cmd != NULL)
 		node->cmd = cmd;
 	// printf("before return : %s\n", *node->cmd);
+	node->type = token->type;
 	node->value = token->value;
 	node->left = NULL;
 	node->right = NULL;
