@@ -3,21 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   test.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: taya <taya@student.fr>                     +#+  +:+       +#+        */
+/*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/12 12:07:43 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/17 19:16:06 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/20 18:23:24 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+// void	print_tree(t_tree *node, int depth, const char *side)
+// {
+// 	if (!node)
+// 		return;
+// 	for (int i = 0; i < depth; i++)
+// 		printf("  ");
+// 	printf("[%s]", side);
+// 	if (node->value)
+// 		printf(" | value: %s", node->value);
+// 	printf("\n");
+// 	print_tree(node->left, depth + 1, "L");
+// 	print_tree(node->right, depth + 1, "R");
+// }
 
 void	print_linked_list(t_token *token_list)
 {
 	t_token *current = token_list;
 	while (current)
 	{
-		printf("token->value = %s		token->type = %d			token->has_space = %d\n", current->value, current->type, current->has_space);
+		// printf("token->value = %s		token->type = %d			token->has_space = %d\n", current->value, current->type, current->has_space);
 		current = current->next;
 	}
 }
@@ -138,8 +152,9 @@ t_token	*get_next_token(t_lexer *lexer)
 	char	*current;
 
 	skip_whitespace(lexer);
+	
 	if (lexer->position >= lexer->lenght)
-		return (0);
+		return (NULL);
 	current = lexer->input + lexer->position;
 	if (current[0] == '\'' || current[0] == '"')
 		return (handle_quote(lexer, *current));
@@ -218,18 +233,46 @@ void	append_token(t_token **head, t_token *token)
 	tmp->next = token;
 }
 
-t_tree *create_tree_node(t_token *token)
+t_tree *create_tree_node(t_token *token, char **cmd)
 {
 	t_tree	*node;
 
 	node = malloc(sizeof(t_tree));
 	if (!node)
 		return (NULL);
-	node->type = token->type;
+	// for (int i = 0; cmd[i]; i++)
+	// {
+	// 	printf("cmd[%d] = %s\n", i, cmd[i]);
+	// }
+	// node->type = token->type;
+	if (cmd != NULL)
+		node->cmd = cmd;
+	// printf("before return : %s\n", *node->cmd);
+	node->value = token->value;
 	node->left = NULL;
 	node->right = NULL;
 	return (node);
 }
+
+// t_token *get_last_redir(t_token *token)
+// {
+// 	t_token *pipe = NULL;
+// 	t_token *tmp;
+// 	size_t	paren = 0;
+
+// 	tmp = token;
+// 	while(tmp->next)
+// 	{
+// 		if (tmp->type == 9)
+// 			paren++;
+// 		else if (tmp->type == 10)
+// 			paren--;
+// 		if (tmp->type == 2 && paren == 0)
+// 			pipe = tmp;
+// 		tmp = tmp->next;
+// 	}
+// 	return (pipe);
+// }
 
 t_token *get_last_pipe(t_token *token)
 {
@@ -298,9 +341,108 @@ t_token *sub_left(t_token *token, t_token *opr)
 	return (head);
 }
 
-// t_tree	*parse_something()
+t_tree *parse_cmd(t_token *token)
+{
+	// write(1, "1\n", 2);
+	t_token *tmp = token;
+	char **value = NULL;
+	int i = 0;
+	print_linked_list(tmp);
+	// write(1, "2\n", 2);
+	value = malloc(sizeof(char *) * 1000);
+	if (!value)
+		return NULL;
+	if (tmp && !tmp->next)
+	{
+		value[i] = tmp->value;
+		i++;
+	}
+	while (tmp->next && tmp->next->type == 1)
+	{
+		// write(1, "enter\n", 6);
+		value[i] = tmp->value;
+		i++;
+		tmp = tmp->next;
+
+		if (!tmp->next || tmp->next->type != 1) {
+			value[i] = tmp->value;
+			i++;
+			tmp = tmp->next;
+			// write(1, "more than one word\n", 19);
+			break;
+		}
+	}
+	// write(1, "5\n", 2);
+	if (token->next && token->next->type != 1)
+	{
+		tmp = token->next;
+		t_token *head = NULL;
+		t_token *current = NULL;
+
+		while (tmp && tmp->next)
+		{
+			t_token *redir_token = tmp;
+			t_token *value_token = tmp->next;
+
+			t_token *new_token = malloc(sizeof(t_token));
+			if (!new_token)
+				return NULL;
+
+			new_token->type = redir_token->type;
+			new_token->value = ft_strdup(value_token->value);
+			new_token->next = NULL;
+
+			if (!head)
+			{
+				head = new_token;
+				current = new_token;
+			}
+			else
+			{
+				current->next = new_token;
+				current = current->next;
+			}
+
+			tmp = value_token->next;
+		}
+
+		// print_linked_list(head);
+		return create_tree_node(head, NULL);
+	}
+	value[i] = NULL;
+	// write(1, "yes one cmd\n", 12);
+	return create_tree_node(token, value);
+}
+
+
+// t_tree *parse_cmd(t_token *token)
 // {
-	
+// 	// if (token->type == 1 && (!token->next || token->next->type == 1))
+// 	if (token->next && token->next->type != 1)
+// 	{
+// 		t_token *current;
+// 		t_token *copy = current;
+// 		t_token *tmp =  token->next;
+// 		// size_t redir;
+// 		// char *value;
+// 		while (tmp)
+// 		{
+// 			printf("1\n");
+// 			current = malloc(sizeof(t_token));
+// 			if (!current)
+// 				return NULL;
+// 		// 	// redir = tmp->type;
+// 			current->type = tmp->type;
+// 			tmp = tmp->next;
+// 		// 	// value = tmp->value;
+// 			current->value = ft_strdup(tmp->value);
+// 			tmp = tmp->next;
+// 			current = current->next; 
+// 		}
+// 		print_linked_list(current);
+// 		printf("2\n");
+// 	}
+// 	return(create_tree_node(token));
 // }
 
 t_tree	*parse_paren(t_token *token)
@@ -309,8 +451,11 @@ t_tree	*parse_paren(t_token *token)
 	t_token *tmp = token;
 	size_t	paren = 0;
 	if (tmp->type != 9)
-		return NULL;
-		// return(parse_something());
+	{
+		// write(1, "yes cmd\n", 8);
+		return(parse_cmd(token));
+	}
+	// write(1, "yes paren\n", 10);
 	while (tmp)
 	{
 		if (tmp->type == 9)
@@ -330,9 +475,9 @@ t_tree	*parse_paren(t_token *token)
 		return NULL;
 	}
 	t_token *sub_token = sub_left(token->next, current);
-	printf("paren_sub_token : ");
-	print_linked_list(sub_token);
-	printf("\n");
+	// printf("paren_sub_token : ");
+	// print_linked_list(sub_token);
+	// printf("\n");
 	return(parse_op(sub_token));
 }
 
@@ -345,15 +490,16 @@ t_tree	*parse_pipes(t_token *token)
 
 	if (pipe)
 	{
-		t_tree *node = create_tree_node(token);
+		write(1, "yes pipe\n", 9);
+		t_tree *node = create_tree_node(pipe, NULL);
 		left_token = sub_left(tmp, pipe);
-		printf("pipe_left_token : ");
-		print_linked_list(left_token);
-		printf("\n");
+		// printf("pipe_left_token : ");
+		// print_linked_list(left_token);
+		// printf("\n");
 		right_token = pipe->next;
-		printf("pipe_right_token : ");
-		print_linked_list(right_token);
-		printf("\n");
+		// printf("pipe_right_token : ");
+		// print_linked_list(right_token);
+		// printf("\n");
 		node->left = parse_pipes(left_token);
 		node->right = parse_pipes(right_token);
 		return (node);
@@ -370,15 +516,17 @@ t_tree	*parse_op(t_token *token)
 
 	if (opr)
 	{
-		t_tree *node = create_tree_node(token);
+		write(1, "yes op\n", 7);
+		t_tree *node = create_tree_node(opr, NULL);
+		// print_tree(node,0);
 		left_token = sub_left(tmp, opr);
-		printf("op_left_token : ");
-		print_linked_list(left_token);
-		printf("\n");
+		// printf("op_left_token : ");
+		// print_linked_list(left_token);
+		// printf("\n");
 		right_token = opr->next;
-		printf("op_right_token : ");
-		print_linked_list(right_token);
-		printf("\n");
+		// printf("op_right_token : ");
+		// print_linked_list(right_token);
+		// printf("\n");
 		node->left = parse_op(left_token);
 		node->right = parse_op(right_token);
 		return (node);
@@ -386,19 +534,34 @@ t_tree	*parse_op(t_token *token)
 	return (parse_pipes(token));
 }
 
-// int	main(int argc, char **argv)
+// int	main(int argc, char **argv, char **env)
 // {
 // 	char	*input;
 // 	t_lexer	*lexer;
 // 	t_token	*token;
 // 	t_token *token_list = NULL;
-// 	// t_tree	*node = NULL;
+// 	t_tree	*node = NULL;
 
 // 	(void)argc;
+// 	(void)env;
 // 	(void)argv;
+// 	// signal(SIGQUIT, SIG_IGN);
+//     // signal(SIGINT, handler);
+//     rl_catch_signals = 0;
 // 	while (1)
 // 	{
 // 		input = readline("minishell> ");
+// 		if (!input)
+//         {
+//             write(1, "exit\n", 5);
+//             exit(0);
+//         }
+//         if (input[0] == '\0')
+//         {
+//             free(input);
+//             continue;
+//         }
+// 		add_history(input);
 // 		lexer = initialize_lexer(input);
 // 		token_list = NULL;
 // 		while (lexer->position < lexer->lenght)
@@ -412,13 +575,87 @@ t_tree	*parse_op(t_token *token)
 // 			// node = create_tree_node(token_list);
 // 			// printf("token->value = %s			token->type = %d\n", token->value, token->type);
 // 		}
-// 		parse_op(token_list);
+// 		// print_linked_list(token_list);
+// 		node = parse_op(token_list);
+// 		printf("after return : %s\n", node->cmd[1]);
+// 		print_tree(node, 0, "NODE");
+//         // execute_builtin(token_list, &envlist);
+// 		// printf("%s\n", node->left->token->value);
+// 		// write(1, "hh\n", 3);
+// 		// char *full_path = find_cmd_path(node->left->token->value, env);
+// 		// if (!full_path)
+// 		// {
+// 		// 	perror("command not found");
+// 		// 	return (1);
+// 		// }
+
+// 		// printf("Trying to exec: %s\n", full_path); // optional for debug
+
+// 		// if (execve(full_path, &node->left->token->value, env) == -1)
+// 		// {
+// 		// 	perror("execve failed");
+// 		// 	free(full_path);
+// 		// 	return (1);
+// 		// }
+
+// 		// free(full_path); // will never reach here if execve succeeds
+// // 	return (0);
 // 		// t_token *current = token_list;
 // 		// while (current)
 // 		// {
 // 		// 	printf("token->value = %s		token->type = %d\n", current->value, current->type);
 // 		// 	current = current->next;
 // 		// }
+// 	}
+// 	return (0);
+// }
+
+// int	main(int argc, char **argv, char **env)
+// {
+//     (void)argc;
+//     (void)argv;
+// 	(void)env;
+//     t_token *token_list = NULL;
+//     // int pipe_fd[MAX_PIPES][2];
+//     // t_data data;
+// 	char	*input;
+// 	t_lexer	*lexer;
+// 	t_token	*token;
+//     // int status;
+//     signal(SIGQUIT, SIG_IGN);
+//     signal(SIGINT, handler);
+//     t_env *envlist = init_env(env);
+
+//     rl_catch_signals = 0;
+// 	while (1)
+// 	{
+// 		input = readline("minishell> ");
+//          if (!input)
+//         {
+//             write(1, "exit\n", 5);
+//             exit(0);
+//         }
+//         if (input[0] == '\0')
+//         {
+//             free(input);
+//             continue;
+//         }
+//         if (input)
+//         {
+//             add_history(input); 
+//             lexer = initialize_lexer(input);
+//             token_list = NULL;
+//             while (lexer->position < lexer->lenght)
+//             {
+//                 token = get_next_token(lexer);
+//                 if (!token)
+//                     continue ;
+//                 token->type = token_type(token);
+//                 append_token(&token_list, token);
+//             }
+//             parse_op(token_list);
+//             free(input);
+//         }
 // 	}
 // 	return (0);
 // }

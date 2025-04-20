@@ -13,22 +13,24 @@ void	handler(int sig)
 
 int	main(int argc, char **argv, char **env)
 {
-    (void)argc;
-    (void)argv;
-    t_token *token_list = NULL;
 	char	*input;
 	t_lexer	*lexer;
 	t_token	*token;
-    // t_tree *node;
-    signal(SIGQUIT, SIG_IGN);
-    signal(SIGINT, handler);
-    t_env *envlist = init_env(env);
+	t_token *token_list = NULL;
+	t_tree	*node = NULL;
+    // t_env *envlist = init_env(env);
 
+
+	(void)argc;
+	(void)env;
+	(void)argv;
+	signal(SIGQUIT, SIG_IGN);
+    signal(SIGINT, handler);
     rl_catch_signals = 0;
 	while (1)
 	{
 		input = readline("minishell> ");
-         if (!input)
+		if (!input)
         {
             write(1, "exit\n", 5);
             exit(0);
@@ -38,24 +40,21 @@ int	main(int argc, char **argv, char **env)
             free(input);
             continue;
         }
-        if (input)
-        {
-            add_history(input); 
-            lexer = initialize_lexer(input);
-            token_list = NULL;
-            while (lexer->position < lexer->lenght)
-            {
-                token = get_next_token(lexer);
-                if (!token->value)
-                    continue ;
-                token->type = token_type(token);
-                append_token(&token_list, token);
-            }
-            parse_op(token_list);
-            // execute_tree(node, env);
-            execute_builtin(token_list, &envlist);
-            free(input);
-        }
+		add_history(input);
+		lexer = initialize_lexer(input);
+		token_list = NULL;
+		while (lexer->position < lexer->lenght)
+		{
+			token = get_next_token(lexer);
+			if (!token)
+				continue;
+			token->type = token_type(token);
+			append_token(&token_list, token);
+		}
+		node = parse_op(token_list);
+		execute_tree(node, env);
+        // execute_builtin(token_list, &envlist);
+        free(input);
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 12:58:09 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/16 12:56:18 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/20 18:35:24 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,12 @@ typedef struct s_token {
 }	t_token;
 
 typedef struct s_tree {
-	t_type		type;
-	struct s_tree *left;
-	struct s_tree *right;
 	t_token *token;
-	// char **cmd;
-	// char *file;
+	t_type type;
+	char *value;
+	struct s_tree	*left;
+	struct s_tree	*right;
+	char **cmd;
 }	t_tree;
 
 typedef struct s_env
