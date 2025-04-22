@@ -52,7 +52,10 @@ int	main(int argc, char **argv, char **env)
 			append_token(&token_list, token);
 		}
 		node = parse_op(token_list);
-		execute_tree(node, env, envlist);
+		// printf("cmd = %s\n", node->cmd[0]);
+		// for (int i = 0; node->cmd[i]; i++)
+    // 	printf("cmd[%d] = %s\n", i, node->cmd[i]);
+		execute_tree(node, env, &envlist);
         free(input);
 	}
 	return (0);

@@ -110,6 +110,8 @@ void update_env(char *name, char *value, t_env **env_list)
     new_env->next = *env_list;
     *env_list = new_env;
 }
+
+
 char *get_env_value(char *name, t_env *env_list)
 {
     t_env *current = env_list;
@@ -133,10 +135,10 @@ int execute_builtin(t_tree *node, t_env **envlist)
         return(ft_pwd());
     else if (strcmp(node->cmd[0], "export") == 0)
         return(ft_export(node->cmd, envlist));
-    // else if (strcmp(node->cmd[0], "unset") == 0)
-    //     return(ft_unset(node, envlist));
+    else if (strcmp(node->cmd[0], "unset") == 0)
+        return(ft_unset(node->cmd, envlist));
     else if (strcmp(node->cmd[0], "env") == 0)
-        return(ft_env(*envlist));
+        return(ft_env(envlist));
     else if (strcmp(node->cmd[0], "exit") == 0)
         return(ft_exit(node->cmd, *envlist));
     return (0);

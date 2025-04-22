@@ -61,7 +61,7 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist)
         close(pipe_fd[0]);
         dup2(pipe_fd[1], STDOUT_FILENO);
         close(pipe_fd[1]);
-        execute_tree(node->left, env, envlist);
+        execute_tree(node->left, env, &envlist);
         exit(0);
     }
     pid2 = fork();
@@ -72,7 +72,7 @@ int execute_pipe(t_tree *node, char **env, t_env *envlist)
         close(pipe_fd[1]);
         dup2(pipe_fd[0], STDIN_FILENO);
         close(pipe_fd[0]);
-        execute_tree(node->right, env, envlist);
+        execute_tree(node->right, env, &envlist);
         exit(0);
     }
     close(pipe_fd[0]);
@@ -110,19 +110,21 @@ int handle_redirection(t_tree *node)
     return (0);
 }
 
-int execute_tree(t_tree *node, char **env, t_env *envlist)
+int execute_tree(t_tree *node, char **env, t_env **envlist)
 {
     int status;
 
     status = 0;
+		// printf("cmd = %s\n", node->cmd[0]);
+		// printf("type = %d\n", node->type);
     if (node->type == PIPE)
-        return (execute_pipe(node, env, envlist));
+        return (execute_pipe(node, env, *envlist));
     else if (node->type == CMD)
     {
-        if (is_builtin(node->cmd[0]))
-            return (execute_builtin(node, &envlist));
-        else
-            return (execute_cmds(node->cmd, env));
+			if (is_builtin(node->cmd[0]))
+					return (execute_builtin(node, envlist));
+      else
+          return (execute_cmds(node->cmd, env));
     }
     // else if (node->type == REDIR_IN || node->type == REDIR_OUT || node->type == APPEND || node->type == HEREDOC)
     //  {

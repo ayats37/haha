@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 12:58:09 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/20 22:41:39 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/22 13:36:33 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,9 @@ int ft_echo(char **cmd, t_env *env_list);
 int ft_pwd();
 // int ft_cd(t_tree *path);
 // int ft_unset(t_token *token, t_env **env_list);
+int ft_unset(char **cmd, t_env **env_list);
 int ft_exit(char **cmd, t_env *env_list);
-int ft_env(t_env *env_list);
+int ft_env(t_env **env_list);
 int ft_export(char **cmd, t_env **env_list);
 int execute_builtin(t_tree *node, t_env **envlist);
 int handle_variable(char *str, t_env *env_list);
@@ -112,7 +113,7 @@ char	*find_cmd_path(char *cmd, char **env);
 char	**split_cmd(char *cmd);
 char	**ft_split(char const *s, char c);
 // int execute_tree(t_tree *node, char **env, t_env *envlist);
-int execute_tree(t_tree *node, char **env, t_env *envlist);
+int execute_tree(t_tree *node, char **env, t_env **envlist);
 int execute_cmds(char **cmds, char **env);
 void write_error(char *message);
 // int execute_pipe(t_tree *node, char **env, t_env *envlist);

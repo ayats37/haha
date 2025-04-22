@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/13 12:09:19 by taya              #+#    #+#             */
-/*   Updated: 2025/04/20 22:49:34 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/22 13:48:17 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,38 +90,40 @@ int ft_echo(char **cmd, t_env *env_list)
     return (0);
 }
 
-// int ft_export(t_token *token, t_env **env_list)
-// {
-//     t_token *input = token;
-//    char *equal_sign;
-//    char *name;
-//    char *value;
-   
-//    input = input->next;
-//    if (!input || !input->value)
-//     return(1);
-//    equal_sign = ft_strchr(input->value, '=');
-//    if (!equal_sign)
-//         return(1);
-//    name = strndup(input->value, equal_sign - input->value);
-//    value = ft_strdup(equal_sign + 1);
-//    update_env(name, value, env_list);
-//    free(name);
-//    free(value);
-//    return (0);
-// }
-
-int ft_env(t_env *env_list)
+int ft_export(char **cmd, t_env **env_list)
 {
-    t_env *current;
+    char *equal_sign;
+    char *name;
+    char *value;
+    int i = 1;
+     
+    if (!cmd || !cmd[i]) 
+        return(1);
+		while (cmd[i])
+		{
+				equal_sign = ft_strchr(cmd[i], '=');
+				if (!equal_sign) 
+						return(1); 
+				name = strndup(cmd[i], equal_sign - cmd[i]);
+				value = ft_strdup(equal_sign + 1);
+				update_env(name, value, env_list);
+				free(name);
+				free(value);
+				i++;
+		}
+    return (0);
+}
+
+int ft_env(t_env **env_list)
+{
+    t_env *current = *env_list;
     
-    current = env_list;
-    while(current)
+    while (current)
     {
         printf("%s=%s\n", current->name, current->value);
         current = current->next;
     }
-    return(0);
+    return (0);
 }
 
 int ft_exit(char **cmd, t_env *env_list)
@@ -147,34 +149,32 @@ int ft_exit(char **cmd, t_env *env_list)
     return (0);
 }
 
-// int ft_unset(t_token *token, t_env **env_list)
-// {
-//     t_token *var = token;
-//     t_env *current = *env_list;
-//     t_env *prev = NULL;
-
-//     var = var->next;
-//     if (!var || !var->value)
-//         return (1);
-//     while(current)
-//     {
-//         if (strcmp(var->value, current->name) == 0)
-//         {
-//             if (prev == NULL)
-//                 *env_list = current->next;
-//             else
-//                 prev->next = current->next;
-//             free(current->name);
-//             free(current->value);
-//             free(current);
-//             return (0);
-//         }
-//         prev = current;
-//         current = current->next;
-//     }
-//     return(1);
-// }
-
+int ft_unset(char **cmd, t_env **env_list)
+{
+    t_env *current = *env_list;
+    t_env *prev = NULL;
+		int i = 1;
+		
+    if (!cmd || !cmd[i])
+        return (1);
+    while(current)
+    {
+        if (strcmp(cmd[i], current->name) == 0)
+        {
+            if (prev == NULL)
+                *env_list = current->next;
+            else
+                prev->next = current->next;
+            free(current->name);
+            free(current->value);
+            free(current);
+            return (0);
+        }
+        prev = current;
+        current = current->next;
+    }
+    return(1);
+}
 // int ft_cd(t_token *token)
 // {
 //     t_token *path = token;
