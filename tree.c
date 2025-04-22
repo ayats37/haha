@@ -115,8 +115,6 @@ int execute_tree(t_tree *node, char **env, t_env **envlist)
     int status;
 
     status = 0;
-		// printf("cmd = %s\n", node->cmd[0]);
-		// printf("type = %d\n", node->type);
     if (node->type == PIPE)
         return (execute_pipe(node, env, *envlist));
     else if (node->type == CMD)
@@ -131,7 +129,7 @@ int execute_tree(t_tree *node, char **env, t_env **envlist)
     //     status = handle_redirection(node);
     //     if (status != 0)
     //         return (status);
-    //     return (execute_tree(node->left, env, envlist, token));
+    //     return (execute_tree(node->left, env, envlist));
     //  } 
      else if (node->type == AND || node->type == OR)
      {
