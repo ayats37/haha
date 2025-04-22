@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 12:58:09 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/22 13:36:33 by taya             ###   ########.fr       */
+/*   Updated: 2025/04/22 14:09:28 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <string.h>
+#include <errno.h>
 
 #define MAX_PIPES 1024
 
@@ -101,6 +102,7 @@ int handle_variable(char *str, t_env *env_list);
 int ft_echo(char **cmd, t_env *env_list);
 int ft_pwd();
 // int ft_cd(t_tree *path);
+int ft_cd(char **cmd, t_env *envlist);
 // int ft_unset(t_token *token, t_env **env_list);
 int ft_unset(char **cmd, t_env **env_list);
 int ft_exit(char **cmd, t_env *env_list);

@@ -129,8 +129,8 @@ int execute_builtin(t_tree *node, t_env **envlist)
 {
     if (strcmp(node->cmd[0], "echo") == 0)
         return(ft_echo(node->cmd, *envlist));
-    // else if (strcmp(node->cmd[0], "cd") == 0)
-    //     return(ft_cd(node));
+    else if (strcmp(node->cmd[0], "cd") == 0)
+        return(ft_cd(node->cmd, *envlist));
     else if (strcmp(node->cmd[0], "pwd") == 0)
         return(ft_pwd());
     else if (strcmp(node->cmd[0], "export") == 0)
