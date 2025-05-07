@@ -6,7 +6,7 @@
 /*   By: taya <taya@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 12:58:09 by ouel-afi          #+#    #+#             */
-/*   Updated: 2025/04/22 14:09:28 by taya             ###   ########.fr       */
+/*   Updated: 2025/05/05 23:23:47 by taya             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 #include <string.h>
 #include <errno.h>
 
-#define MAX_PIPES 1024
 
 typedef struct s_lexer {
 	int position;
@@ -36,7 +35,7 @@ typedef struct s_lexer {
 
 typedef enum s_type {
     CMD = 1,
-	PIPE,
+	PIPE,	
 	SINGLE_QUOTE,
 	DOUBLE_QUOTE,
     REDIR_IN,
@@ -45,7 +44,7 @@ typedef enum s_type {
     HEREDOC,
     OPEN_PAREN,
     CLOSE_PAREN,
-	OR,
+	OR,		
 	AND
 } t_type;
 
@@ -57,8 +56,9 @@ typedef struct s_token {
 }	t_token;
 
 typedef struct s_tree {
-	t_token *token;
+	t_token *redir;
 	t_type type;
+	int		has_space;
 	char *value;
 	struct s_tree	*left;
 	struct s_tree	*right;
@@ -74,7 +74,12 @@ typedef struct s_env
 }	t_env;
 
 
-
+int	check_errors(t_token *token);
+int calculate_cmd(t_token *token);
+void merge_tokens(t_token **tokens);
+void	print_linked_list(t_token *token_list);
+void join_tokens(t_token *token);
+void	print_tree(t_tree *node, int depth, const char *side);
 //****************************************parse********************************************************************************
 t_lexer	*initialize_lexer(char *input);
 int	is_space(t_lexer *lexer);
@@ -121,5 +126,8 @@ void write_error(char *message);
 // int execute_pipe(t_tree *node, char **env, t_env *envlist);
 int execute_pipe(t_tree *node, char **env, t_env *envlist);
 int is_builtin(char *cmd);
+int  is_alpha(int c);
+void env_append(char *name, char *value, t_env **env_list);
+t_env *find_env_var(char *name, t_env *env_list);
 
 #endif
